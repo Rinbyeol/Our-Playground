@@ -3,7 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>우리들의 놀이터</title>
+    <title>나만의 다기능 웹페이지</title>
+    
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
+
     <style>
         /* 기본 스타일 설정 */
         body { font-family: 'Pretendard', 'Malgun Gothic', sans-serif; margin: 0; padding: 0; background-color: #f4f7f6; color: #333; }
@@ -13,15 +17,13 @@
         nav button:hover { background-color: #2980b9; }
 
         .content-section { background: white; max-width: 600px; margin: 30px auto; padding: 40px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); text-align: center; }
-        .hidden { display: none; }
+        .hidden { display: none !important; }
 
         .action-btn { background-color: #e74c3c; color: white; border: none; padding: 15px 30px; border-radius: 5px; cursor: pointer; font-size: 18px; font-weight: bold; margin-top: 20px; transition: background-color 0.2s; }
         .action-btn:hover { background-color: #c0392b; }
-        
         .fortune-btn { background-color: #9b59b6; }
         .fortune-btn:hover { background-color: #8e44ad; }
         
-        /* 난이도 버튼 전용 색상 */
         .btn-easy { background-color: #2ecc71; padding: 10px 20px; font-size: 16px; margin: 5px; }
         .btn-normal { background-color: #f39c12; padding: 10px 20px; font-size: 16px; margin: 5px; }
         .btn-hard { background-color: #8e44ad; padding: 10px 20px; font-size: 16px; margin: 5px; }
@@ -41,10 +43,7 @@
         .note {
             position: absolute; top: -30px; left: 50%; transform: translateX(-50%); width: 80px; height: 20px;
             background-color: #34dbcc; border-radius: 5px; box-shadow: 0 0 10px #34dbcc;
-            /* 애니메이션 시간(속도)은 이제 자바스크립트에서 결정합니다 */
-            animation-name: dropNote;
-            animation-timing-function: linear;
-            animation-fill-mode: forwards;
+            animation-name: dropNote; animation-timing-function: linear; animation-fill-mode: forwards;
         }
 
         @keyframes dropNote { 0% { top: -30px; } 100% { top: 450px; } }
@@ -58,11 +57,30 @@
         @keyframes fadeOut { 0% { opacity: 1; transform: translate(-50%, -50%) scale(1); } 100% { opacity: 0; transform: translate(-50%, -50%) scale(1.5); } }
         #scoreBoard { font-size: 24px; font-weight: bold; margin-bottom: 10px; }
         
-        /* 난이도 선택 화면 */
         #difficultySelector {
             position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            width: 100%; text-align: center;
+            width: 100%; text-align: center; z-index: 10;
         }
+
+        #gameOverScreen {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background-color: rgba(0, 0, 0, 0.85); color: white;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            z-index: 20;
+        }
+
+        #playerNameInput {
+            padding: 10px; font-size: 16px; border-radius: 5px; border: none; margin: 15px 0; text-align: center; width: 80%;
+        }
+
+        #rankingBoard {
+            max-width: 300px; margin: 20px auto; background: #ecf0f1; padding: 20px; border-radius: 10px; text-align: left;
+        }
+        
+        .ranking-item {
+            display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #bdc3c7; font-weight: bold;
+        }
+        .ranking-item:last-child { border-bottom: none; }
     </style>
 </head>
 <body>
@@ -78,27 +96,23 @@
         <button onclick="showSection('game')">리듬게임</button>
     </nav>
 
-    <!-- 1. 홈 화면 -->
     <div id="home" class="content-section">
         <h2>환영합니다!</h2>
         <p>상단 메뉴를 클릭하여 원하는 기능을 사용해 보세요.</p>
     </div>
 
-    <!-- 2. '밥' 화면 -->
     <div id="bab" class="content-section hidden">
         <h2>오늘 뭐 먹지?</h2>
         <button class="action-btn" onclick="recommendMenu()">메뉴 추천받기</button>
         <div id="result"></div>
     </div>
 
-    <!-- 3. '운세' 화면 -->
     <div id="fortune" class="content-section hidden">
         <h2>오늘의 운세 뽑기 🥠</h2>
         <button class="action-btn fortune-btn" onclick="drawFortune()">운세 확인하기</button>
         <div id="fortuneResult"></div>
     </div>
 
-    <!-- 4. '리듬게임' 화면 -->
     <div id="game" class="content-section hidden">
         <h2>미니 리듬게임 🎵</h2>
         <p>노트가 <b>빨간 선</b>에 닿을 때 <b>스페이스바</b>를 누르거나 <b>화면을 터치</b>하세요!</p>
@@ -107,23 +121,51 @@
         <div id="gameArea">
             <div class="target-line" id="targetLine"></div>
             
-            <!-- 난이도 선택 버튼 모음 -->
             <div id="difficultySelector">
                 <p style="color: white; margin-top: 0; margin-bottom: 10px; font-weight: bold;">난이도를 선택하세요</p>
-                <button class="action-btn btn-easy" onclick="startRhythmGame('easy')">쉬움</button>
-                <button class="action-btn btn-normal" onclick="startRhythmGame('normal')">보통</button><br>
-                <button class="action-btn btn-hard" onclick="startRhythmGame('hard')">어려움</button>
+                <button class="action-btn btn-easy" onclick="startRhythmGame('쉬움')">쉬움</button>
+                <button class="action-btn btn-normal" onclick="startRhythmGame('보통')">보통</button><br>
+                <button class="action-btn btn-hard" onclick="startRhythmGame('어려움')">어려움</button>
             </div>
+
+            <div id="gameOverScreen" class="hidden">
+                <h2 style="margin: 0; color: #f1c40f;">GAME OVER</h2>
+                <p>최종 점수: <span id="finalScoreDisplay">0</span>점</p>
+                <input type="text" id="playerNameInput" placeholder="이름을 입력하세요" maxlength="6">
+                <button class="action-btn" style="padding: 10px 20px; font-size: 16px; margin-top: 0;" onclick="saveRankingToFirebase()">랭킹 등록하기</button>
+            </div>
+        </div>
+
+        <div id="rankingBoard">
+            <h3 style="margin-top: 0; text-align: center; color: #2c3e50;">🏆 실시간 명예의 전당 (Top 5) 🏆</h3>
+            <div id="rankingList">랭킹을 불러오는 중...</div>
         </div>
     </div>
 
     <script>
+        // ==========================================
+        // 🔑 [중요] 파이어베이스 열쇠 입력 구간
+        // 아래의 firebaseConfig 변수 내용을 파이어베이스에서 복사해 온 본인의 코드로 교체하세요!
+        // ==========================================
+        const firebaseConfig = {
+            apiKey: "여기에_본인의_apiKey를_넣으세요",
+            authDomain: "여기에_본인의_authDomain을_넣으세요",
+            projectId: "여기에_본인의_projectId를_넣으세요",
+            storageBucket: "여기에_본인의_storageBucket을_넣으세요",
+            messagingSenderId: "여기에_본인의_messagingSenderId를_넣으세요",
+            appId: "여기에_본인의_appId를_넣으세요"
+        };
+
+        // 파이어베이스 초기화 및 데이터베이스(db) 연결
+        firebase.initializeApp(UbGN4HtLKYW3SvXLU1j1);
+        const db = firebase.firestore();
+
+
         // --- 1. 화면 전환 기능 ---
         function showSection(sectionId) {
-            document.querySelectorAll('.content-section').forEach(section => {
-                section.classList.add('hidden');
-            });
+            document.querySelectorAll('.content-section').forEach(section => section.classList.add('hidden'));
             document.getElementById(sectionId).classList.remove('hidden');
+            if(sectionId === 'game') fetchRankings(); // 게임 탭 열 때 실시간 서버 랭킹 불러오기
         }
 
         // --- 2. 밥 & 운세 기능 ---
@@ -145,66 +187,118 @@
             document.getElementById('fortuneResult').innerHTML = `<div style="font-size: 32px; font-weight: bold; color: #8e44ad; margin-bottom: 15px;">${selected.result}</div><div style="font-size: 18px; color: #555;">${selected.comment}</div>`;
         }
 
-        // --- 3. 미니 리듬게임 기능 ---
+        // --- 3. 미니 리듬게임 & 서버 랭킹 기능 ---
         let score = 0;
         let gameInterval;
         let isGameRunning = false;
-        let currentDropSpeed = '2s'; // 노트 떨어지는 기본 속도
+        let currentDropSpeed = '2s';
+        let currentPlayedDifficulty = ''; 
 
         const gameArea = document.getElementById('gameArea');
         const targetLine = document.getElementById('targetLine');
         const difficultySelector = document.getElementById('difficultySelector');
+        const gameOverScreen = document.getElementById('gameOverScreen');
 
-        // 난이도(difficulty)를 입력받아 게임 시작
         function startRhythmGame(difficulty) {
             if (isGameRunning) return;
             isGameRunning = true;
+            currentPlayedDifficulty = difficulty;
             
-            difficultySelector.style.display = 'none';
+            difficultySelector.classList.add('hidden');
+            gameOverScreen.classList.add('hidden');
+            
             score = 0;
             document.getElementById('gameScore').innerText = score;
+            document.getElementById('playerNameInput').value = '';
             
-            let spawnRate = 1000; // 노트가 만들어지는 기본 간격(ms)
-
-            // 선택한 난이도에 따라 속도와 간격 설정
-            if (difficulty === 'easy') {
-                spawnRate = 1200;       // 1.2초마다 생성 (느림)
-                currentDropSpeed = '2.5s'; // 떨어지는데 2.5초 걸림 (느림)
-            } else if (difficulty === 'normal') {
-                spawnRate = 800;        // 0.8초마다 생성 (보통)
-                currentDropSpeed = '1.5s'; // 떨어지는데 1.5초 걸림 (보통)
-            } else if (difficulty === 'hard') {
-                spawnRate = 450;        // 0.45초마다 생성 (빠름)
-                currentDropSpeed = '0.9s'; // 떨어지는데 0.9초 걸림 (빠름)
-            }
+            let spawnRate = 1000;
+            if (difficulty === '쉬움') { spawnRate = 1200; currentDropSpeed = '2.5s'; } 
+            else if (difficulty === '보통') { spawnRate = 800; currentDropSpeed = '1.5s'; } 
+            else if (difficulty === '어려움') { spawnRate = 450; currentDropSpeed = '0.9s'; }
 
             gameInterval = setInterval(createNote, spawnRate);
-            setTimeout(stopRhythmGame, 15000); // 15초 후 게임 종료
+            setTimeout(stopRhythmGame, 15000); // 15초 후 종료
         }
 
         function createNote() {
             const note = document.createElement('div');
             note.classList.add('note');
-            
-            // 난이도에 따라 정해진 떨어지는 속도(currentDropSpeed)를 적용
             note.style.animationDuration = currentDropSpeed;
-            
-            note.addEventListener('animationend', () => {
-                if(note.parentNode) note.remove();
-            });
-            
+            note.addEventListener('animationend', () => { if(note.parentNode) note.remove(); });
             gameArea.appendChild(note);
         }
 
         function stopRhythmGame() {
             clearInterval(gameInterval);
             isGameRunning = false;
-            
-            // 게임이 끝나면 다시 난이도 선택 창을 보여줌
-            difficultySelector.style.display = 'block';
-            
             document.querySelectorAll('.note').forEach(n => n.remove());
-            alert(`게임 종료! 최종 점수는 ${score}점 입니다.`);
+            
+            document.getElementById('finalScoreDisplay').innerText = score;
+            gameOverScreen.classList.remove('hidden');
+        }
+
+        // 🌟 [서버 연동] 구글 Firestore 서버에 점수 저장하기
+        function saveRankingToFirebase() {
+            let playerName = document.getElementById('playerNameInput').value.trim();
+            if (playerName === "") playerName = "익명";
+
+            // 파이어베이스 'rankings'라는 이름의 데이터 창고에 데이터 추가
+            db.collection("rankings").add({
+                name: playerName,
+                score: score,
+                difficulty: currentPlayedDifficulty,
+                timestamp: firebase.firestore.FieldValue.serverTimestamp() // 저장된 시간 순서용
+            })
+            .then(() => {
+                gameOverScreen.classList.add('hidden');
+                difficultySelector.classList.remove('hidden');
+                fetchRankings(); // 저장 직후 최신 랭킹 다시 불러오기
+                alert("서버에 랭킹이 성공적으로 등록되었습니다!");
+            })
+            .catch((error) => {
+                console.error("랭킹 저장 중 에러 발생: ", error);
+                alert("랭킹 저장에 실패했습니다.");
+            });
+        }
+
+        // 🌟 [서버 연동] 구글 Firestore 서버에서 상위 5개 랭킹 가져와서 화면에 띄우기
+        function fetchRankings() {
+            const rankingListDiv = document.getElementById('rankingList');
+            rankingListDiv.innerText = "랭킹 불러오는 중...";
+
+            // 점수(score)가 높은 순서대로 최대 5개 가져오기
+            db.collection("rankings")
+                .orderBy("score", "desc")
+                .limit(5)
+                .get()
+                .then((querySnapshot) => {
+                    if (querySnapshot.empty) {
+                        rankingListDiv.innerText = "아직 등록된 랭킹이 없습니다.";
+                        return;
+                    }
+
+                    let htmlString = "";
+                    let index = 0;
+                    
+                    querySnapshot.forEach((doc) => {
+                        let data = doc.data();
+                        let medal = index === 0 ? "🥇" : index === 1 ? "🥈" : index === 2 ? "🥉" : `${index + 1}위`;
+                        
+                        htmlString += `
+                            <div class="ranking-item">
+                                <span>${medal} ${data.name} <span style="font-size:12px; color:#7f8c8d;">(${data.difficulty})</span></span>
+                                <span style="color:#e74c3c;">${data.score}점</span>
+                            </div>
+                        `;
+                        index++;
+                    });
+                    
+                    rankingListDiv.innerHTML = htmlString;
+                })
+                .catch((error) => {
+                    console.error("랭킹을 불러오는 중 에러 발생: ", error);
+                    rankingListDiv.innerText = "랭킹을 불러오지 못했습니다.";
+                });
         }
 
         function checkHit() {
@@ -244,8 +338,7 @@
         });
 
         gameArea.addEventListener('pointerdown', (e) => {
-            // 버튼을 클릭한 경우는 판정에서 제외
-            if (e.target.tagName !== 'BUTTON') {
+            if (e.target.tagName !== 'BUTTON' && e.target.tagName !== 'INPUT' && !gameOverScreen.contains(e.target)) {
                 checkHit();
             }
         });
