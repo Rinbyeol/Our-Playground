@@ -38,7 +38,7 @@
             overflow: hidden; border: 4px solid #16213e; display: flex;
         }
         
-        .lane { flex: 1; border-right: 1px solid #0f3460; position: relative; }
+        .lane { flex: 1; border-right: 1px solid #0f3460; position: relative; cursor: pointer; }
         .lane:last-child { border-right: none; }
         
         .target-btn {
@@ -47,7 +47,7 @@
             border: 3px solid #e94560; border-radius: 50%;
             display: flex; justify-content: center; align-items: center;
             color: rgba(255, 255, 255, 0.6); font-weight: bold; font-size: 20px;
-            transition: 0.1s; z-index: 10; user-select: none;
+            transition: 0.1s; z-index: 10; user-select: none; pointer-events: none;
         }
         .target-btn.pressed { background-color: rgba(233, 69, 96, 0.5); box-shadow: 0 0 15px #e94560; transform: translateX(-50%) scale(0.9); }
 
@@ -70,7 +70,7 @@
         
         #difficultySelector {
             position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            width: 100%; text-align: center; z-index: 30; background-color: rgba(26, 26, 46, 0.9); height: 100%;
+            width: 100%; text-align: center; z-index: 30; background-color: rgba(26, 26, 46, 0.95); height: 100%;
             display: flex; flex-direction: column; justify-content: center; align-items: center;
         }
 
@@ -142,13 +142,13 @@
         <div id="scoreBoard">점수: <span id="gameScore">0</span></div>
         
         <div id="gameArea">
-            <div class="lane" id="lane0" onclick="checkHit(0)">
+            <div class="lane" id="lane0" onpointerdown="handleLaneTouch(0)">
                 <div class="target-btn" id="btnA">A</div>
             </div>
-            <div class="lane" id="lane1" onclick="checkHit(1)">
+            <div class="lane" id="lane1" onpointerdown="handleLaneTouch(1)">
                 <div class="target-btn" id="btnS">S</div>
             </div>
-            <div class="lane" id="lane2" onclick="checkHit(2)">
+            <div class="lane" id="lane2" onpointerdown="handleLaneTouch(2)">
                 <div class="target-btn" id="btnD">D</div>
             </div>
             
@@ -243,7 +243,7 @@
         }
 
         // ==========================================
-        // 🎵 업그레이드된 3키 리듬게임 로직
+        // 🎵 업그레이드된 3키 리듬게임 로직 (오류 수정 완료)
         // ==========================================
         let score = 0; 
         let gameInterval; 
@@ -268,29 +268,29 @@
             document.getElementById('gameScore').innerText = score; 
             document.getElementById('playerNameInput').value = '';
             
-            let spawnRate = 800; // 기본 생성 간격
+            let spawnRate = 800;
             if (difficulty === '쉬움') { 
                 spawnRate = 900; 
                 currentDropSpeed = '2.0s'; 
             } else if (difficulty === '보통') { 
-                spawnRate = 500; // 노트가 더 자주 쏟아짐
+                spawnRate = 500; 
                 currentDropSpeed = '1.4s'; 
             } else if (difficulty === '어려움') { 
-                spawnRate = 300; // 폭풍 러시!
+                spawnRate = 300; 
                 currentDropSpeed = '0.9s'; 
             }
 
-            // 0, 1, 2 레인 중 무작위로 노트 생성 (더 촘촘하게 쏟아짐)
             gameInterval = setInterval(() => {
                 const randomLane = Math.floor(Math.random() * 3);
                 createNote(randomLane);
             }, spawnRate);
 
-            setTimeout(stopRhythmGame, 20000); // 20초간 진행
+            setTimeout(stopRhythmGame, 20000);
         }
 
         function createNote(laneIndex) {
             const lane = document.getElementById(`lane${laneIndex}`);
+            if (!lane) return;
             const note = document.createElement('div'); 
             note.classList.add('note'); 
             note.style.animationDuration = currentDropSpeed;
@@ -310,6 +310,7 @@
         function checkHit(laneIndex) {
             if (!isGameRunning) return;
             const lane = document.getElementById(`lane${laneIndex}`);
+            if (!lane) return;
             const notes = lane.querySelectorAll('.note');
             const targetBtn = document.getElementById(btnIds[laneIndex]);
             const targetRect = targetBtn.getBoundingClientRect();
@@ -317,7 +318,6 @@
 
             notes.forEach(note => {
                 const noteRect = note.getBoundingClientRect();
-                // 판정선 근처에 왔을 때 
                 if (noteRect.bottom >= targetRect.top - 35 && noteRect.top <= targetRect.bottom + 35) {
                     note.remove(); 
                     score += 10; 
@@ -330,8 +330,18 @@
             if (!hitSuccess) showHitEffect("MISS", laneIndex);
         }
 
+        function handleLaneTouch(laneIndex) {
+            const btn = document.getElementById(btnIds[laneIndex]);
+            if (btn) {
+                btn.classList.add('pressed');
+                setTimeout(() => btn.classList.remove('pressed'), 100);
+            }
+            checkHit(laneIndex);
+        }
+
         function showHitEffect(text, laneIndex) {
             const lane = document.getElementById(`lane${laneIndex}`);
+            if (!lane) return;
             const effect = document.createElement('div'); 
             effect.classList.add('hit-effect'); 
             effect.innerText = text;
@@ -347,7 +357,8 @@
             const laneIndex = keys.indexOf(e.code);
             if (laneIndex !== -1) {
                 e.preventDefault();
-                document.getElementById(btnIds[laneIndex]).classList.add('pressed');
+                const btn = document.getElementById(btnIds[laneIndex]);
+                if (btn) btn.classList.add('pressed');
                 checkHit(laneIndex);
             }
         });
@@ -355,7 +366,8 @@
         document.addEventListener('keyup', (e) => {
             const laneIndex = keys.indexOf(e.code);
             if (laneIndex !== -1) {
-                document.getElementById(btnIds[laneIndex]).classList.remove('pressed');
+                const btn = document.getElementById(btnIds[laneIndex]);
+                if (btn) btn.classList.remove('pressed');
             }
         });
 
@@ -374,7 +386,9 @@
         }
 
         function fetchRankings() {
-            const rankingListDiv = document.getElementById('rankingList'); rankingListDiv.innerText = "랭킹 불러오는 중...";
+            const rankingListDiv = document.getElementById('rankingList'); 
+            if (!rankingListDiv) return;
+            rankingListDiv.innerText = "랭킹 불러오는 중...";
             db.collection("rankings").orderBy("score", "desc").limit(5).get()
             .then((querySnapshot) => {
                 if (querySnapshot.empty) { rankingListDiv.innerText = "아직 등록된 랭킹이 없습니다."; return; }
@@ -398,4 +412,164 @@
             const winners = parseInt(document.getElementById('drawWinners').value);
             const container = document.getElementById('drawCards');
             
-            if
+            if (winners >= total) { alert("당첨 수는 총 인원보다 적어야 합니다!"); return; }
+            if (total < 2 || total > 50) { alert("인원수는 2~50명 사이로 설정해주세요."); return; }
+
+            container.innerHTML = '';
+            let results = Array(winners).fill('당첨 🎉').concat(Array(total - winners).fill('꽝 💥'));
+            for (let i = results.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [results[i], results[j]] = [results[j], results[i]];
+            }
+
+            results.forEach((res) => {
+                const card = document.createElement('div');
+                card.className = 'draw-card';
+                card.innerText = res;
+                card.onclick = function() {
+                    if(!this.classList.contains('revealed')) {
+                        this.classList.add('revealed');
+                        if(res.includes('당첨')) this.classList.add('win');
+                    }
+                };
+                container.appendChild(card);
+            });
+        }
+
+
+        // ==========================================
+        // 🪜 사다리타기 로직
+        // ==========================================
+        let ladderLines = []; 
+        let ladderPlayers = 0;
+        let isLadderAnimating = false;
+
+        function setupLadder() {
+            ladderPlayers = parseInt(document.getElementById('ladderCount').value);
+            if(ladderPlayers < 2 || ladderPlayers > 10) { alert("2명에서 10명 사이로 입력해주세요."); return; }
+            
+            document.getElementById('ladderContainer').classList.remove('hidden');
+            const topDiv = document.getElementById('ladderTop');
+            const bottomDiv = document.getElementById('ladderBottom');
+            
+            topDiv.innerHTML = ''; bottomDiv.innerHTML = '';
+            
+            for(let i=0; i<ladderPlayers; i++) {
+                topDiv.innerHTML += `
+                    <div style="width: 100%; text-align: center;">
+                        <input type="text" class="ladder-input top-input" placeholder="이름${i+1}">
+                        <button class="ladder-btn" id="startBtn${i}" onclick="traceLadder(${i})">시작</button>
+                    </div>`;
+                bottomDiv.innerHTML += `
+                    <div style="width: 100%; text-align: center;">
+                        <input type="text" class="ladder-input bot-input" placeholder="결과${i+1}">
+                        <div class="result-box hidden" id="resBox${i}"></div>
+                    </div>`;
+            }
+            
+            const canvas = document.getElementById('ladderCanvas');
+            const ctx = canvas.getContext('2d');
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            document.getElementById('ladderStartBtn').style.display = 'block';
+        }
+
+        function startLadderGame() {
+            const canvas = document.getElementById('ladderCanvas');
+            const ctx = canvas.getContext('2d');
+            
+            document.querySelectorAll('.top-input, .bot-input').forEach(el => el.style.display = 'none');
+            document.querySelectorAll('.ladder-btn').forEach((btn, i) => {
+                btn.style.display = 'block';
+                btn.innerText = document.querySelectorAll('.top-input')[i].value || `사람${i+1}`;
+            });
+            document.querySelectorAll('.result-box').forEach((box, i) => {
+                box.classList.remove('hidden');
+                box.innerText = document.querySelectorAll('.bot-input')[i].value || `결과${i+1}`;
+            });
+            document.getElementById('ladderStartBtn').style.display = 'none';
+
+            const w = canvas.width; const h = canvas.height;
+            const step = w / ladderPlayers;
+            ctx.clearRect(0, 0, w, h);
+            
+            ctx.strokeStyle = '#bdc3c7';
+            ctx.lineWidth = 4;
+            ctx.lineCap = "round";
+            
+            for(let i=0; i<ladderPlayers; i++) {
+                let x = step * i + step/2;
+                ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, h); ctx.stroke();
+            }
+
+            ladderLines = [];
+            const rows = 12;
+            const rowHeight = h / rows;
+            
+            for(let r = 1; r < rows; r++) {
+                let y = r * rowHeight;
+                for(let c = 0; c < ladderPlayers - 1; c++) {
+                    if(Math.random() < 0.4) {
+                        ladderLines.push({ row: r, y: y, col: c });
+                        let startX = step * c + step/2;
+                        let endX = step * (c+1) + step/2;
+                        ctx.beginPath(); ctx.moveTo(startX, y); ctx.lineTo(endX, y); ctx.stroke();
+                        c++; 
+                    }
+                }
+            }
+        }
+
+        function traceLadder(startIndex) {
+            if(isLadderAnimating) return;
+            isLadderAnimating = true;
+
+            const canvas = document.getElementById('ladderCanvas');
+            const ctx = canvas.getContext('2d');
+            const step = canvas.width / ladderPlayers;
+            
+            const colors = ['#e74c3c', '#e67e22', '#f1c40f', '#2ecc71', '#1abc9c', '#3498db', '#9b59b6', '#ff9ff3', '#00d2d3', '#ff6b6b'];
+            ctx.strokeStyle = colors[startIndex % colors.length];
+            ctx.lineWidth = 6;
+
+            let currentCol = startIndex;
+            let currentY = 0;
+            
+            function getNextPoint() {
+                let nextLine = null;
+                let minSubY = 9999;
+                for(let line of ladderLines) {
+                    if(line.y > currentY + 1) {
+                        if((line.col === currentCol || line.col === currentCol - 1) && line.y < minSubY) {
+                            minSubY = line.y;
+                            nextLine = line;
+                        }
+                    }
+                }
+                return nextLine;
+            }
+
+            function animatePath() {
+                let next = getNextPoint();
+                if(!next) {
+                    ctx.beginPath(); ctx.moveTo(step * currentCol + step/2, currentY); ctx.lineTo(step * currentCol + step/2, canvas.height); ctx.stroke();
+                    let finalResult = document.getElementById(`resBox${currentCol}`);
+                    finalResult.style.backgroundColor = ctx.strokeStyle;
+                    finalResult.style.color = "white";
+                    isLadderAnimating = false;
+                    return;
+                }
+
+                ctx.beginPath(); ctx.moveTo(step * currentCol + step/2, currentY); ctx.lineTo(step * currentCol + step/2, next.y); ctx.stroke();
+                let nextCol = (next.col === currentCol) ? currentCol + 1 : currentCol - 1;
+                ctx.beginPath(); ctx.moveTo(step * currentCol + step/2, next.y); ctx.lineTo(step * nextCol + step/2, next.y); ctx.stroke();
+
+                currentCol = nextCol;
+                currentY = next.y;
+                setTimeout(animatePath, 300);
+            }
+            animatePath();
+        }
+    </script>
+
+</body>
+</html>
