@@ -420,7 +420,7 @@
             }
         }
 
-        // 특정 참가자의 사다리 길을 따라가는 애니메이션
+// 특정 참가자의 사다리 길을 따라가는 애니메이션
         function traceLadder(startIndex) {
             if(isLadderAnimating) return;
             isLadderAnimating = true;
@@ -453,7 +453,7 @@
                 return nextLine;
             }
 
-            // 빠른 속도로 길을 따라 그리는 재귀 함수
+            // 길을 따라 그리는 재귀 함수
             function animatePath() {
                 let next = getNextPoint();
                 
@@ -480,8 +480,8 @@
                 currentCol = nextCol;
                 currentY = next.y;
 
-                // 약간의 지연 후(50ms) 다음 단계로 넘어가서 지루하지 않게 연출
-                setTimeout(animatePath, 50);
+                // 💡 [수정된 부분] 50 -> 300으로 변경하여 속도를 늦춤 (숫자가 클수록 더 느려집니다)
+                setTimeout(animatePath, 300);
             }
 
             animatePath();
