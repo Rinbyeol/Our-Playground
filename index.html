@@ -31,16 +31,56 @@
         #result { margin-top: 30px; font-size: 28px; font-weight: bold; color: #27ae60; }
         #fortuneResult { margin-top: 30px; }
 
-        /* --- 리듬게임 스타일 --- */
-        #gameArea { position: relative; width: 100%; max-width: 300px; height: 400px; background-color: #2c3e50; margin: 20px auto; border-radius: 10px; overflow: hidden; border: 4px solid #34495e; touch-action: none; cursor: pointer; }
-        .target-line { position: absolute; bottom: 50px; width: 100%; height: 10px; background-color: #e74c3c; box-shadow: 0 0 10px #e74c3c; }
-        .note { position: absolute; top: -30px; left: 50%; transform: translateX(-50%); width: 80px; height: 20px; background-color: #34dbcc; border-radius: 5px; box-shadow: 0 0 10px #34dbcc; animation-name: dropNote; animation-timing-function: linear; animation-fill-mode: forwards; }
-        @keyframes dropNote { 0% { top: -30px; } 100% { top: 450px; } }
-        .hit-effect { position: absolute; top: 60%; left: 50%; transform: translate(-50%, -50%); color: #f1c40f; font-size: 28px; font-weight: bold; pointer-events: none; animation: fadeOut 0.5s forwards; text-shadow: 2px 2px 4px rgba(0,0,0,0.5); }
-        @keyframes fadeOut { 0% { opacity: 1; transform: translate(-50%, -50%) scale(1); } 100% { opacity: 0; transform: translate(-50%, -50%) scale(1.5); } }
+        /* --- 업그레이드된 3키 리듬게임 스타일 --- */
+        #gameArea { 
+            position: relative; width: 100%; max-width: 360px; height: 500px; 
+            background-color: #1a1a2e; margin: 20px auto; border-radius: 10px; 
+            overflow: hidden; border: 4px solid #16213e; display: flex;
+        }
+        
+        .lane { flex: 1; border-right: 1px solid #0f3460; position: relative; }
+        .lane:last-child { border-right: none; }
+        
+        .target-btn {
+            position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%);
+            width: 60px; height: 60px; background-color: rgba(255, 255, 255, 0.1);
+            border: 3px solid #e94560; border-radius: 50%;
+            display: flex; justify-content: center; align-items: center;
+            color: rgba(255, 255, 255, 0.6); font-weight: bold; font-size: 20px;
+            transition: 0.1s; z-index: 10; user-select: none;
+        }
+        .target-btn.pressed { background-color: rgba(233, 69, 96, 0.5); box-shadow: 0 0 15px #e94560; transform: translateX(-50%) scale(0.9); }
+
+        .note { 
+            position: absolute; top: -40px; left: 50%; transform: translateX(-50%); 
+            width: 70px; height: 20px; background-color: #0f3460; border: 2px solid #43dde6;
+            border-radius: 10px; box-shadow: 0 0 10px #43dde6; 
+            animation-name: dropNote; animation-timing-function: linear; animation-fill-mode: forwards; 
+        }
+        @keyframes dropNote { 0% { top: -40px; } 100% { top: 520px; } }
+        
+        .hit-effect { 
+            position: absolute; top: 75%; left: 50%; transform: translate(-50%, -50%); 
+            color: #f1c40f; font-size: 22px; font-weight: bold; pointer-events: none; 
+            animation: fadeOut 0.4s forwards; text-shadow: 2px 2px 4px rgba(0,0,0,0.8); z-index: 20;
+        }
+        @keyframes fadeOut { 0% { opacity: 1; transform: translate(-50%, -50%) scale(1); } 100% { opacity: 0; transform: translate(-50%, -50%) scale(1.4); } }
+        
         #scoreBoard { font-size: 24px; font-weight: bold; margin-bottom: 10px; }
-        #difficultySelector { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 100%; text-align: center; z-index: 10; }
-        #gameOverScreen { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.85); color: white; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 20; }
+        
+        #difficultySelector {
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            width: 100%; text-align: center; z-index: 30; background-color: rgba(26, 26, 46, 0.9); height: 100%;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+        }
+
+        #gameOverScreen {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background-color: rgba(0, 0, 0, 0.85); color: white;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            z-index: 40;
+        }
+
         #playerNameInput { padding: 10px; font-size: 16px; border-radius: 5px; border: none; margin: 15px 0; text-align: center; width: 80%; }
         #rankingBoard { max-width: 300px; margin: 20px auto; background: #ecf0f1; padding: 20px; border-radius: 10px; text-align: left; }
         .ranking-item { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #bdc3c7; font-weight: bold; }
@@ -79,40 +119,44 @@
         <button onclick="showSection('ladder')">사다리타기</button>
     </nav>
 
-    <!-- 홈 화면 -->
     <div id="home" class="content-section">
         <h2>제작자 -이건우, 이현성, 장성현-</h2>
         <p>AI를 이용한 웹페이지 연구중, 원하는 기능 문의 바람 제발요</p>
     </div>
 
-    <!-- 밥 화면 -->
     <div id="bab" class="content-section hidden">
         <h2>오늘 뭐 먹지?</h2>
         <button class="action-btn" onclick="recommendMenu()">메뉴 추천받기</button>
         <div id="result"></div>
     </div>
 
-    <!-- 운세 화면 -->
     <div id="fortune" class="content-section hidden">
         <h2>오늘의 운세 뽑기 🥠</h2>
         <button class="action-btn fortune-btn" onclick="drawFortune()">운세 확인하기</button>
         <div id="fortuneResult"></div>
     </div>
 
-    <!-- 리듬게임 화면 -->
     <div id="game" class="content-section hidden">
-        <h2>미니 리듬게임 🎵</h2>
-        <p>노트가 <b>빨간 선</b>에 닿을 때 <b>스페이스바</b>를 누르거나 <b>화면을 터치</b>하세요!</p>
+        <h2>3키 미니 리듬게임 🎵</h2>
+        <p>노트가 선에 닿을 때 <b>A, S, D</b> 키를 누르거나 화면을 터치하세요!</p>
         <div id="scoreBoard">점수: <span id="gameScore">0</span></div>
         
         <div id="gameArea">
-            <div class="target-line" id="targetLine"></div>
+            <div class="lane" id="lane0" onclick="checkHit(0)">
+                <div class="target-btn" id="btnA">A</div>
+            </div>
+            <div class="lane" id="lane1" onclick="checkHit(1)">
+                <div class="target-btn" id="btnS">S</div>
+            </div>
+            <div class="lane" id="lane2" onclick="checkHit(2)">
+                <div class="target-btn" id="btnD">D</div>
+            </div>
             
             <div id="difficultySelector">
-                <p style="color: white; margin-top: 0; margin-bottom: 10px; font-weight: bold;">난이도를 선택하세요</p>
-                <button class="action-btn btn-easy" onclick="startRhythmGame('쉬움')">쉬움</button>
-                <button class="action-btn btn-normal" onclick="startRhythmGame('보통')">보통</button><br>
-                <button class="action-btn btn-hard" onclick="startRhythmGame('어려움')">어려움</button>
+                <p style="color: white; margin-top: 0; margin-bottom: 15px; font-size: 20px; font-weight: bold;">난이도를 선택하세요</p>
+                <button class="action-btn btn-easy" onclick="startRhythmGame('쉬움')">쉬움 (여유로움)</button><br>
+                <button class="action-btn btn-normal" onclick="startRhythmGame('보통')">보통 (노트 쏟아짐)</button><br>
+                <button class="action-btn btn-hard" onclick="startRhythmGame('어려움')">어려움 (폭풍 러시)</button>
             </div>
 
             <div id="gameOverScreen" class="hidden">
@@ -129,11 +173,8 @@
         </div>
     </div>
 
-    <!-- 제비뽑기 화면 -->
     <div id="draw" class="content-section hidden">
         <h2>두근두근 제비뽑기 🎯</h2>
-        <p>인원수와 당첨 수를 입력하고 카드를 뒤집어보세요!</p>
-        
         <div class="draw-inputs">
             <div>
                 <label>총 인원: </label>
@@ -145,11 +186,9 @@
             </div>
         </div>
         <button class="action-btn" style="background-color: #2ecc71;" onclick="startDraw()">제비 만들기</button>
-        
         <div id="drawCards"></div>
     </div>
 
-    <!-- 사다리타기 화면 -->
     <div id="ladder" class="content-section hidden">
         <h2>운명의 사다리타기 🪜</h2>
         <div style="margin-bottom: 20px;">
@@ -159,15 +198,9 @@
         </div>
 
         <div id="ladderContainer" class="hidden">
-            <!-- 맨 위: 이름 입력칸 및 클릭 버튼 -->
             <div id="ladderTop" class="ladder-row"></div>
-            
-            <!-- 중간: 사다리 그려지는 영역 -->
             <canvas id="ladderCanvas" width="520" height="300"></canvas>
-            
-            <!-- 맨 아래: 결과 입력칸 및 도달 결과 -->
             <div id="ladderBottom" class="ladder-row"></div>
-            
             <button id="ladderStartBtn" class="action-btn" style="background-color: #8e44ad;" onclick="startLadderGame()">사다리 생성 및 시작!</button>
         </div>
     </div>
@@ -195,11 +228,11 @@
             if(sectionId === 'game') fetchRankings(); 
         }
 
-        // --- 밥 & 운세 기능 (기존 그대로 유지) ---
+        // --- 밥 & 운세 기능 ---
         const foodList = [ "김치찌개", "된장찌개", "순두부찌개", "부대찌개", "제육볶음", "불고기", "갈비탕", "설렁탕 /곰탕", "삼계탕", "육개장", "청국장", "동태찌개", "간장게장 / 양념게장", "생선구이 (고등어, 임연수, 갈치)", "짜장면", "짬뽕", "탕수육", "볶음밥", "칼국수", "콩국수", "잔치국수", "물냉면 / 비빔냉면", "막국수", "라면", "마라탕 / 마라샹궈", "쌀국수", "삼겹살 / 목살", "소고기 구이 (등심, 갈비살 등)", "닭갈비", "곱창구이 / 막창구이 / 대창구이", "족발 / 보쌈", "닭볶음탕", "양꼬치", "떡볶이", "김밥", "튀김 (오징어, 김말이, 야채 등)", "순대", "라면+김밥 세트", "토스트 / 샌드위치", "햄버거 세트", "피자", "치킨 (후라이드, 양념, 반반)", "돈가스", "파스타 / 리조또", "오므라이스", "카레라이스", "초밥 (스시)", "규동 / 돈부리", "라멘", "타코야끼 / 오코노미야끼", "샌드위치 / 샐러드", "포케" ];
         function recommendMenu() {
             const randomIndex = Math.floor(Math.random() * foodList.length);
-            document.getElementById('result').innerText = `추천 메뉴: ${foodList[randomIndex]}!`;
+            document.getElementById('result').innerText = `추천 메뉴: ${foodList[randomIndex]}! 😋`;
         }
 
         const fortuneData = [ { result: "대길 (大吉) 🌟", comment: "오늘 하는 일마다 술술 풀릴 거예요." }, { result: "중길 (中吉) ✨", comment: "평온하고 안정적인 하루입니다." }, { result: "소길 (小吉) 🍀", comment: "소소한 행운이 찾아옵니다." }, { result: "주의 (注意) 🌧️", comment: "신중하게 행동하면 좋은 하루가 될 거예요." } ];
@@ -209,42 +242,134 @@
             document.getElementById('fortuneResult').innerHTML = `<div style="font-size: 32px; font-weight: bold; color: #8e44ad; margin-bottom: 15px;">${selected.result}</div><div style="font-size: 18px; color: #555;">${selected.comment}</div>`;
         }
 
-        // --- 리듬게임 로직 (기존 그대로 유지) ---
-        let score = 0; let gameInterval; let isGameRunning = false; let currentDropSpeed = '2s'; let currentPlayedDifficulty = ''; 
-        const gameArea = document.getElementById('gameArea'); const targetLine = document.getElementById('targetLine'); const difficultySelector = document.getElementById('difficultySelector'); const gameOverScreen = document.getElementById('gameOverScreen');
+        // ==========================================
+        // 🎵 업그레이드된 3키 리듬게임 로직
+        // ==========================================
+        let score = 0; 
+        let gameInterval; 
+        let isGameRunning = false; 
+        let currentDropSpeed = '1.5s'; 
+        let currentPlayedDifficulty = ''; 
+
+        const difficultySelector = document.getElementById('difficultySelector'); 
+        const gameOverScreen = document.getElementById('gameOverScreen');
+        const keys = ['KeyA', 'KeyS', 'KeyD'];
+        const btnIds = ['btnA', 'btnS', 'btnD'];
 
         function startRhythmGame(difficulty) {
             if (isGameRunning) return;
-            isGameRunning = true; currentPlayedDifficulty = difficulty;
-            difficultySelector.classList.add('hidden'); gameOverScreen.classList.add('hidden');
-            score = 0; document.getElementById('gameScore').innerText = score; document.getElementById('playerNameInput').value = '';
+            isGameRunning = true; 
+            currentPlayedDifficulty = difficulty;
             
-            let spawnRate = 1000;
-            if (difficulty === '쉬움') { spawnRate = 1200; currentDropSpeed = '2.5s'; } 
-            else if (difficulty === '보통') { spawnRate = 800; currentDropSpeed = '1.5s'; } 
-            else if (difficulty === '어려움') { spawnRate = 450; currentDropSpeed = '0.9s'; }
+            difficultySelector.classList.add('hidden'); 
+            gameOverScreen.classList.add('hidden');
+            
+            score = 0; 
+            document.getElementById('gameScore').innerText = score; 
+            document.getElementById('playerNameInput').value = '';
+            
+            let spawnRate = 800; // 기본 생성 간격
+            if (difficulty === '쉬움') { 
+                spawnRate = 900; 
+                currentDropSpeed = '2.0s'; 
+            } else if (difficulty === '보통') { 
+                spawnRate = 500; // 노트가 더 자주 쏟아짐
+                currentDropSpeed = '1.4s'; 
+            } else if (difficulty === '어려움') { 
+                spawnRate = 300; // 폭풍 러시!
+                currentDropSpeed = '0.9s'; 
+            }
 
-            gameInterval = setInterval(createNote, spawnRate);
-            setTimeout(stopRhythmGame, 15000); 
+            // 0, 1, 2 레인 중 무작위로 노트 생성 (더 촘촘하게 쏟아짐)
+            gameInterval = setInterval(() => {
+                const randomLane = Math.floor(Math.random() * 3);
+                createNote(randomLane);
+            }, spawnRate);
+
+            setTimeout(stopRhythmGame, 20000); // 20초간 진행
         }
 
-        function createNote() {
-            const note = document.createElement('div'); note.classList.add('note'); note.style.animationDuration = currentDropSpeed;
+        function createNote(laneIndex) {
+            const lane = document.getElementById(`lane${laneIndex}`);
+            const note = document.createElement('div'); 
+            note.classList.add('note'); 
+            note.style.animationDuration = currentDropSpeed;
+            
             note.addEventListener('animationend', () => { if(note.parentNode) note.remove(); });
-            gameArea.appendChild(note);
+            lane.appendChild(note);
         }
 
         function stopRhythmGame() {
-            clearInterval(gameInterval); isGameRunning = false;
+            clearInterval(gameInterval); 
+            isGameRunning = false;
             document.querySelectorAll('.note').forEach(n => n.remove());
-            document.getElementById('finalScoreDisplay').innerText = score; gameOverScreen.classList.remove('hidden');
+            document.getElementById('finalScoreDisplay').innerText = score; 
+            gameOverScreen.classList.remove('hidden');
         }
 
+        function checkHit(laneIndex) {
+            if (!isGameRunning) return;
+            const lane = document.getElementById(`lane${laneIndex}`);
+            const notes = lane.querySelectorAll('.note');
+            const targetBtn = document.getElementById(btnIds[laneIndex]);
+            const targetRect = targetBtn.getBoundingClientRect();
+            let hitSuccess = false;
+
+            notes.forEach(note => {
+                const noteRect = note.getBoundingClientRect();
+                // 판정선 근처에 왔을 때 
+                if (noteRect.bottom >= targetRect.top - 35 && noteRect.top <= targetRect.bottom + 35) {
+                    note.remove(); 
+                    score += 10; 
+                    document.getElementById('gameScore').innerText = score; 
+                    showHitEffect("PERFECT!", laneIndex); 
+                    hitSuccess = true;
+                }
+            });
+
+            if (!hitSuccess) showHitEffect("MISS", laneIndex);
+        }
+
+        function showHitEffect(text, laneIndex) {
+            const lane = document.getElementById(`lane${laneIndex}`);
+            const effect = document.createElement('div'); 
+            effect.classList.add('hit-effect'); 
+            effect.innerText = text;
+            if(text === "MISS") effect.style.color = "#e74c3c";
+            
+            lane.appendChild(effect);
+            setTimeout(() => { if(effect.parentNode) effect.remove(); }, 400);
+        }
+
+        // 키보드 입력 이벤트 (A, S, D)
+        document.addEventListener('keydown', (e) => {
+            if (!isGameRunning) return;
+            const laneIndex = keys.indexOf(e.code);
+            if (laneIndex !== -1) {
+                e.preventDefault();
+                document.getElementById(btnIds[laneIndex]).classList.add('pressed');
+                checkHit(laneIndex);
+            }
+        });
+
+        document.addEventListener('keyup', (e) => {
+            const laneIndex = keys.indexOf(e.code);
+            if (laneIndex !== -1) {
+                document.getElementById(btnIds[laneIndex]).classList.remove('pressed');
+            }
+        });
+
+        // 파이어베이스 랭킹 저장/불러오기
         function saveRankingToFirebase() {
             let playerName = document.getElementById('playerNameInput').value.trim();
             if (playerName === "") playerName = "익명";
             db.collection("rankings").add({ name: playerName, score: score, difficulty: currentPlayedDifficulty, timestamp: firebase.firestore.FieldValue.serverTimestamp() })
-            .then(() => { gameOverScreen.classList.add('hidden'); difficultySelector.classList.remove('hidden'); fetchRankings(); alert("서버에 랭킹이 성공적으로 등록되었습니다!"); })
+            .then(() => { 
+                gameOverScreen.classList.add('hidden'); 
+                difficultySelector.classList.remove('hidden'); 
+                fetchRankings(); 
+                alert("서버에 랭킹이 성공적으로 등록되었습니다!"); 
+            })
             .catch((error) => { console.error("랭킹 저장 중 에러 발생: ", error); alert("랭킹 저장에 실패했습니다."); });
         }
 
@@ -264,229 +389,13 @@
             .catch((error) => { console.error("랭킹을 불러오는 중 에러 발생: ", error); rankingListDiv.innerText = "랭킹을 불러오지 못했습니다."; });
         }
 
-        function checkHit() {
-            if (!isGameRunning) return;
-            const notes = document.querySelectorAll('.note'); const targetRect = targetLine.getBoundingClientRect(); let hitSuccess = false;
-            notes.forEach(note => {
-                const noteRect = note.getBoundingClientRect();
-                if (noteRect.bottom >= targetRect.top - 30 && noteRect.top <= targetRect.bottom + 30) {
-                    note.remove(); score += 10; document.getElementById('gameScore').innerText = score; showHitEffect("PERFECT!"); hitSuccess = true;
-                }
-            });
-            if (!hitSuccess) showHitEffect("MISS!");
-        }
-
-        function showHitEffect(text) {
-            const effect = document.createElement('div'); effect.classList.add('hit-effect'); effect.innerText = text;
-            if(text === "MISS!") effect.style.color = "#e74c3c";
-            gameArea.appendChild(effect);
-            setTimeout(() => { if(effect.parentNode) effect.remove(); }, 500);
-        }
-
-        document.addEventListener('keydown', (e) => { if (!document.getElementById('game').classList.contains('hidden') && e.code === 'Space') { e.preventDefault(); checkHit(); } });
-        gameArea.addEventListener('pointerdown', (e) => { if (e.target.tagName !== 'BUTTON' && e.target.tagName !== 'INPUT' && !gameOverScreen.contains(e.target)) { checkHit(); } });
-
 
         // ==========================================
-        // 🆕 새 기능 1: 제비뽑기 로직
+        // 🎯 제비뽑기 로직
         // ==========================================
         function startDraw() {
             const total = parseInt(document.getElementById('drawTotal').value);
             const winners = parseInt(document.getElementById('drawWinners').value);
             const container = document.getElementById('drawCards');
             
-            if (winners >= total) {
-                alert("당첨 수는 총 인원보다 적어야 합니다!"); return;
-            }
-            if (total < 2 || total > 50) {
-                alert("인원수는 2~50명 사이로 설정해주세요."); return;
-            }
-
-            container.innerHTML = '';
-            
-            // 당첨과 꽝 배열 생성 및 무작위 섞기 (피셔-예이츠 알고리즘)
-            let results = Array(winners).fill('당첨 🎉').concat(Array(total - winners).fill('꽝 💥'));
-            for (let i = results.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [results[i], results[j]] = [results[j], results[i]];
-            }
-
-            // 카드 화면에 그리기
-            results.forEach((res, index) => {
-                const card = document.createElement('div');
-                card.className = 'draw-card';
-                card.innerText = res;
-                card.onclick = function() {
-                    if(!this.classList.contains('revealed')) {
-                        this.classList.add('revealed');
-                        if(res.includes('당첨')) this.classList.add('win');
-                    }
-                };
-                container.appendChild(card);
-            });
-        }
-
-
-        // ==========================================
-        // 🆕 새 기능 2: 사다리타기 로직
-        // ==========================================
-        let ladderLines = []; // 사다리 가로줄 데이터 저장
-        let ladderPlayers = 0;
-        let isLadderAnimating = false;
-
-        function setupLadder() {
-            ladderPlayers = parseInt(document.getElementById('ladderCount').value);
-            if(ladderPlayers < 2 || ladderPlayers > 10) { alert("2명에서 10명 사이로 입력해주세요."); return; }
-            
-            document.getElementById('ladderContainer').classList.remove('hidden');
-            const topDiv = document.getElementById('ladderTop');
-            const bottomDiv = document.getElementById('ladderBottom');
-            
-            topDiv.innerHTML = ''; bottomDiv.innerHTML = '';
-            
-            for(let i=0; i<ladderPlayers; i++) {
-                // 상단 이름 입력칸과 클릭 버튼 (처음엔 버튼 숨김)
-                topDiv.innerHTML += `
-                    <div style="width: 100%; text-align: center;">
-                        <input type="text" class="ladder-input top-input" placeholder="이름${i+1}">
-                        <button class="ladder-btn" id="startBtn${i}" onclick="traceLadder(${i})">시작</button>
-                    </div>`;
-                // 하단 결과 입력칸과 결과 표시칸
-                bottomDiv.innerHTML += `
-                    <div style="width: 100%; text-align: center;">
-                        <input type="text" class="ladder-input bot-input" placeholder="결과${i+1}">
-                        <div class="result-box hidden" id="resBox${i}"></div>
-                    </div>`;
-            }
-            
-            // 캔버스 초기화
-            const canvas = document.getElementById('ladderCanvas');
-            const ctx = canvas.getContext('2d');
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            
-            document.getElementById('ladderStartBtn').style.display = 'block';
-        }
-
-        function startLadderGame() {
-            const canvas = document.getElementById('ladderCanvas');
-            const ctx = canvas.getContext('2d');
-            
-            // UI 변경: 입력칸 비활성화, 시작버튼 표시
-            document.querySelectorAll('.top-input, .bot-input').forEach(el => el.style.display = 'none');
-            document.querySelectorAll('.ladder-btn').forEach((btn, i) => {
-                btn.style.display = 'block';
-                btn.innerText = document.querySelectorAll('.top-input')[i].value || `사람${i+1}`;
-            });
-            document.querySelectorAll('.result-box').forEach((box, i) => {
-                box.classList.remove('hidden');
-                box.innerText = document.querySelectorAll('.bot-input')[i].value || `결과${i+1}`;
-            });
-            document.getElementById('ladderStartBtn').style.display = 'none';
-
-            // 사다리 생성 로직
-            const w = canvas.width; const h = canvas.height;
-            const step = w / ladderPlayers;
-            ctx.clearRect(0, 0, w, h);
-            
-            ctx.strokeStyle = '#bdc3c7';
-            ctx.lineWidth = 4;
-            ctx.lineCap = "round";
-            
-            // 세로선 그리기
-            for(let i=0; i<ladderPlayers; i++) {
-                let x = step * i + step/2;
-                ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, h); ctx.stroke();
-            }
-
-            // 가로선 무작위 생성 (Row 10개로 분할하여 겹치지 않게 배치)
-            ladderLines = [];
-            const rows = 12;
-            const rowHeight = h / rows;
-            
-            for(let r = 1; r < rows; r++) {
-                let y = r * rowHeight;
-                // 현재 줄에서 어느 세로선끼리 연결할지 무작위 결정
-                for(let c = 0; c < ladderPlayers - 1; c++) {
-                    // 40% 확률로 가로선 생성, 단 바로 옆 선과 겹치지 않게
-                    if(Math.random() < 0.4) {
-                        ladderLines.push({ row: r, y: y, col: c });
-                        
-                        let startX = step * c + step/2;
-                        let endX = step * (c+1) + step/2;
-                        ctx.beginPath(); ctx.moveTo(startX, y); ctx.lineTo(endX, y); ctx.stroke();
-                        c++; // 연속된 가로선 방지
-                    }
-                }
-            }
-        }
-
-// 특정 참가자의 사다리 길을 따라가는 애니메이션
-        function traceLadder(startIndex) {
-            if(isLadderAnimating) return;
-            isLadderAnimating = true;
-
-            const canvas = document.getElementById('ladderCanvas');
-            const ctx = canvas.getContext('2d');
-            const step = canvas.width / ladderPlayers;
-            
-            // 참가자마다 다른 색상 부여
-            const colors = ['#e74c3c', '#e67e22', '#f1c40f', '#2ecc71', '#1abc9c', '#3498db', '#9b59b6', '#ff9ff3', '#00d2d3', '#ff6b6b'];
-            ctx.strokeStyle = colors[startIndex % colors.length];
-            ctx.lineWidth = 6;
-
-            let currentCol = startIndex;
-            let currentY = 0;
-            
-            // 현재 위치에서 가장 가까운 다음 가로선을 찾는 함수
-            function getNextPoint() {
-                let nextLine = null;
-                let minSubY = 9999;
-                
-                for(let line of ladderLines) {
-                    if(line.y > currentY + 1) { // 현재 위치보다 아래에 있는 선
-                        if((line.col === currentCol || line.col === currentCol - 1) && line.y < minSubY) {
-                            minSubY = line.y;
-                            nextLine = line;
-                        }
-                    }
-                }
-                return nextLine;
-            }
-
-            // 길을 따라 그리는 재귀 함수
-            function animatePath() {
-                let next = getNextPoint();
-                
-                if(!next) {
-                    // 더 이상 가로선이 없으면 바닥까지 쭉 긋기
-                    ctx.beginPath(); ctx.moveTo(step * currentCol + step/2, currentY); ctx.lineTo(step * currentCol + step/2, canvas.height); ctx.stroke();
-                    
-                    // 결과 텍스트 강조
-                    let finalResult = document.getElementById(`resBox${currentCol}`);
-                    finalResult.style.backgroundColor = ctx.strokeStyle;
-                    finalResult.style.color = "white";
-                    
-                    isLadderAnimating = false;
-                    return;
-                }
-
-                // 1. 다음 가로선이 있는 곳까지 세로로 쭉 그리기
-                ctx.beginPath(); ctx.moveTo(step * currentCol + step/2, currentY); ctx.lineTo(step * currentCol + step/2, next.y); ctx.stroke();
-                
-                // 2. 가로로 이동하기
-                let nextCol = (next.col === currentCol) ? currentCol + 1 : currentCol - 1;
-                ctx.beginPath(); ctx.moveTo(step * currentCol + step/2, next.y); ctx.lineTo(step * nextCol + step/2, next.y); ctx.stroke();
-
-                currentCol = nextCol;
-                currentY = next.y;
-
-                // 💡 [수정된 부분] 50 -> 300으로 변경하여 속도를 늦춤 (숫자가 클수록 더 느려집니다)
-                setTimeout(animatePath, 300);
-            }
-
-            animatePath();
-        }
-    </script>
-
-</body>
-</html>
+            if
