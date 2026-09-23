@@ -16,7 +16,7 @@
         nav button { background-color: #3498db; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; font-size: 16px; font-weight: bold; transition: background-color 0.2s; }
         nav button:hover { background-color: #2980b9; }
 
-        .content-section { background: white; max-width: 600px; margin: 30px auto; padding: 40px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); text-align: center; }
+        .content-section { background: white; max-width: 650px; margin: 30px auto; padding: 40px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); text-align: center; }
         .hidden { display: none !important; }
 
         .action-btn { background-color: #e74c3c; color: white; border: none; padding: 15px 30px; border-radius: 5px; cursor: pointer; font-size: 18px; font-weight: bold; margin-top: 20px; transition: background-color 0.2s; }
@@ -31,16 +31,14 @@
         #result { margin-top: 30px; font-size: 28px; font-weight: bold; color: #27ae60; }
         #fortuneResult { margin-top: 30px; }
 
-        /* --- 업그레이드된 3키 리듬게임 스타일 --- */
+        /* --- 리듬게임 스타일 --- */
         #gameArea { 
             position: relative; width: 100%; max-width: 360px; height: 500px; 
             background-color: #1a1a2e; margin: 20px auto; border-radius: 10px; 
             overflow: hidden; border: 4px solid #16213e; display: flex;
         }
-        
         .lane { flex: 1; border-right: 1px solid #0f3460; position: relative; cursor: pointer; }
         .lane:last-child { border-right: none; }
-        
         .target-btn {
             position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%);
             width: 60px; height: 60px; background-color: rgba(255, 255, 255, 0.1);
@@ -50,7 +48,6 @@
             transition: 0.1s; z-index: 10; user-select: none; pointer-events: none;
         }
         .target-btn.pressed { background-color: rgba(233, 69, 96, 0.5); box-shadow: 0 0 15px #e94560; transform: translateX(-50%) scale(0.9); }
-
         .note { 
             position: absolute; top: -40px; left: 50%; transform: translateX(-50%); 
             width: 70px; height: 20px; background-color: #0f3460; border: 2px solid #43dde6;
@@ -58,29 +55,24 @@
             animation-name: dropNote; animation-timing-function: linear; animation-fill-mode: forwards; 
         }
         @keyframes dropNote { 0% { top: -40px; } 100% { top: 520px; } }
-        
         .hit-effect { 
             position: absolute; top: 75%; left: 50%; transform: translate(-50%, -50%); 
             color: #f1c40f; font-size: 22px; font-weight: bold; pointer-events: none; 
             animation: fadeOut 0.4s forwards; text-shadow: 2px 2px 4px rgba(0,0,0,0.8); z-index: 20;
         }
         @keyframes fadeOut { 0% { opacity: 1; transform: translate(-50%, -50%) scale(1); } 100% { opacity: 0; transform: translate(-50%, -50%) scale(1.4); } }
-        
         #scoreBoard { font-size: 24px; font-weight: bold; margin-bottom: 10px; }
-        
         #difficultySelector {
             position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
             width: 100%; text-align: center; z-index: 30; background-color: rgba(26, 26, 46, 0.95); height: 100%;
             display: flex; flex-direction: column; justify-content: center; align-items: center;
         }
-
         #gameOverScreen {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
             background-color: rgba(0, 0, 0, 0.85); color: white;
             display: flex; flex-direction: column; justify-content: center; align-items: center;
             z-index: 40;
         }
-
         #playerNameInput { padding: 10px; font-size: 16px; border-radius: 5px; border: none; margin: 15px 0; text-align: center; width: 80%; }
         #rankingBoard { max-width: 300px; margin: 20px auto; background: #ecf0f1; padding: 20px; border-radius: 10px; text-align: left; }
         .ranking-item { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #bdc3c7; font-weight: bold; }
@@ -102,6 +94,14 @@
         .ladder-btn:hover { background-color: #2980b9; }
         #ladderCanvas { width: 100%; height: 300px; background-color: #fff; border: 2px solid #ecf0f1; border-radius: 5px; margin-top: -15px; margin-bottom: -15px; position: relative; z-index: 1; }
         .result-box { width: 100%; margin: 0 5px; padding: 5px; text-align: center; font-weight: bold; background-color: #eee; border-radius: 3px; min-height: 20px; }
+        
+        /* --- 번호뽑기 스타일 --- */
+        .number-draw-container { display: flex; flex-wrap: wrap; gap: 20px; margin-top: 20px; }
+        .history-panel { flex: 1; min-width: 150px; border: 2px solid #ecf0f1; border-radius: 10px; padding: 15px; background: #fdfdfd; max-height: 300px; overflow-y: auto; text-align: left; }
+        .history-list { list-style: none; padding: 0; margin: 0; }
+        .history-list li { padding: 8px 0; border-bottom: 1px dashed #bdc3c7; font-size: 16px; font-weight: bold; color: #2c3e50; }
+        .draw-panel { flex: 2; min-width: 250px; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        .rolling-display { width: 120px; height: 120px; line-height: 120px; font-size: 60px; font-weight: bold; color: #e74c3c; background: #fff; border: 4px solid #34495e; border-radius: 20px; margin: 20px 0; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
     </style>
 </head>
 <body>
@@ -117,25 +117,31 @@
         <button onclick="showSection('game')">리듬게임</button>
         <button onclick="showSection('draw')">제비뽑기</button>
         <button onclick="showSection('ladder')">사다리타기</button>
+        <!-- 🆕 번호뽑기 메뉴 추가 -->
+        <button onclick="showSection('numberDraw')">번호뽑기</button>
     </nav>
 
+    <!-- 홈 화면 -->
     <div id="home" class="content-section">
         <h2>제작자 -이건우, 이현성, 장성현-</h2>
         <p>AI를 이용한 웹페이지 연구중, 원하는 기능 문의 바람 제발요</p>
     </div>
 
+    <!-- 밥 화면 -->
     <div id="bab" class="content-section hidden">
         <h2>오늘 뭐 먹지?</h2>
         <button class="action-btn" onclick="recommendMenu()">메뉴 추천받기</button>
         <div id="result"></div>
     </div>
 
+    <!-- 운세 화면 -->
     <div id="fortune" class="content-section hidden">
         <h2>오늘의 운세 뽑기 🥠</h2>
         <button class="action-btn fortune-btn" onclick="drawFortune()">운세 확인하기</button>
         <div id="fortuneResult"></div>
     </div>
 
+    <!-- 리듬게임 화면 -->
     <div id="game" class="content-section hidden">
         <h2>3키 미니 리듬게임 🎵</h2>
         <p>노트가 선에 닿을 때 <b>A, S, D</b> 키를 누르거나 화면을 터치하세요!</p>
@@ -173,6 +179,7 @@
         </div>
     </div>
 
+    <!-- 제비뽑기 화면 -->
     <div id="draw" class="content-section hidden">
         <h2>두근두근 제비뽑기 🎯</h2>
         <div class="draw-inputs">
@@ -189,6 +196,7 @@
         <div id="drawCards"></div>
     </div>
 
+    <!-- 사다리타기 화면 -->
     <div id="ladder" class="content-section hidden">
         <h2>운명의 사다리타기 🪜</h2>
         <div style="margin-bottom: 20px;">
@@ -205,9 +213,39 @@
         </div>
     </div>
 
+    <!-- 🆕 번호뽑기 화면 -->
+    <div id="numberDraw" class="content-section hidden">
+        <h2>행운의 번호 뽑기 🎰</h2>
+        <p>최대 숫자를 설정하고 랜덤 번호를 뽑아보세요!</p>
+        
+        <div class="number-draw-container">
+            <!-- 좌측: 뽑힌 번호 기록 패널 -->
+            <div class="history-panel">
+                <h3 style="margin-top: 0; margin-bottom: 10px; color: #34495e; text-align: center;">📜 뽑힌 번호</h3>
+                <ul class="history-list" id="drawHistoryList">
+                    <!-- 뽑힌 번호들이 이곳에 추가됩니다 -->
+                </ul>
+            </div>
+            
+            <!-- 우측: 번호 뽑기 패널 -->
+            <div class="draw-panel">
+                <div>
+                    <label style="font-weight: bold;">최대 숫자: </label>
+                    <input type="number" id="maxNumberInput" value="45" min="1" style="width: 70px; padding: 5px; font-size: 16px; text-align: center; margin-right: 5px;">
+                    <button class="action-btn" style="padding: 6px 12px; margin: 0; font-size: 14px; background-color: #95a5a6;" onclick="resetNumberDraw()">초기화</button>
+                </div>
+                
+                <!-- 숫자가 돌아가는 디스플레이 -->
+                <div class="rolling-display" id="rollingDisplay">?</div>
+                
+                <button class="action-btn" style="background-color: #f39c12; width: 100%; max-width: 200px; margin-top: 0;" onclick="startRollingDraw()">뽑기 시작!</button>
+            </div>
+        </div>
+    </div>
+
     <script>
         // ==========================================
-        // 🔑 파이어베이스 설정 (기존 키값 유지)
+        // 🔑 파이어베이스 설정
         // ==========================================
         const firebaseConfig = {
            apiKey: "AIzaSyAix77Hg9-cy4IIrvDooGjEdEKGxznq0Js",
@@ -242,9 +280,7 @@
             document.getElementById('fortuneResult').innerHTML = `<div style="font-size: 32px; font-weight: bold; color: #8e44ad; margin-bottom: 15px;">${selected.result}</div><div style="font-size: 18px; color: #555;">${selected.comment}</div>`;
         }
 
-        // ==========================================
-        // 🎵 업그레이드된 3키 리듬게임 로직 (오류 수정 완료)
-        // ==========================================
+        // --- 리듬게임 로직 ---
         let score = 0; 
         let gameInterval; 
         let isGameRunning = false; 
@@ -269,16 +305,9 @@
             document.getElementById('playerNameInput').value = '';
             
             let spawnRate = 800;
-            if (difficulty === '쉬움') { 
-                spawnRate = 900; 
-                currentDropSpeed = '2.0s'; 
-            } else if (difficulty === '보통') { 
-                spawnRate = 500; 
-                currentDropSpeed = '1.4s'; 
-            } else if (difficulty === '어려움') { 
-                spawnRate = 300; 
-                currentDropSpeed = '0.9s'; 
-            }
+            if (difficulty === '쉬움') { spawnRate = 900; currentDropSpeed = '2.0s'; } 
+            else if (difficulty === '보통') { spawnRate = 500; currentDropSpeed = '1.4s'; } 
+            else if (difficulty === '어려움') { spawnRate = 300; currentDropSpeed = '0.9s'; }
 
             gameInterval = setInterval(() => {
                 const randomLane = Math.floor(Math.random() * 3);
@@ -294,7 +323,6 @@
             const note = document.createElement('div'); 
             note.classList.add('note'); 
             note.style.animationDuration = currentDropSpeed;
-            
             note.addEventListener('animationend', () => { if(note.parentNode) note.remove(); });
             lane.appendChild(note);
         }
@@ -346,12 +374,10 @@
             effect.classList.add('hit-effect'); 
             effect.innerText = text;
             if(text === "MISS") effect.style.color = "#e74c3c";
-            
             lane.appendChild(effect);
             setTimeout(() => { if(effect.parentNode) effect.remove(); }, 400);
         }
 
-        // 키보드 입력 이벤트 (A, S, D)
         document.addEventListener('keydown', (e) => {
             if (!isGameRunning) return;
             const laneIndex = keys.indexOf(e.code);
@@ -371,7 +397,6 @@
             }
         });
 
-        // 파이어베이스 랭킹 저장/불러오기
         function saveRankingToFirebase() {
             let playerName = document.getElementById('playerNameInput').value.trim();
             if (playerName === "") playerName = "익명";
@@ -403,10 +428,7 @@
             .catch((error) => { console.error("랭킹을 불러오는 중 에러 발생: ", error); rankingListDiv.innerText = "랭킹을 불러오지 못했습니다."; });
         }
 
-
-        // ==========================================
-        // 🎯 제비뽑기 로직
-        // ==========================================
+        // --- 제비뽑기 로직 ---
         function startDraw() {
             const total = parseInt(document.getElementById('drawTotal').value);
             const winners = parseInt(document.getElementById('drawWinners').value);
@@ -436,13 +458,8 @@
             });
         }
 
-
-        // ==========================================
-        // 🪜 사다리타기 로직
-        // ==========================================
-        let ladderLines = []; 
-        let ladderPlayers = 0;
-        let isLadderAnimating = false;
+        // --- 사다리타기 로직 ---
+        let ladderLines = []; let ladderPlayers = 0; let isLadderAnimating = false;
 
         function setupLadder() {
             ladderPlayers = parseInt(document.getElementById('ladderCount').value);
@@ -455,18 +472,9 @@
             topDiv.innerHTML = ''; bottomDiv.innerHTML = '';
             
             for(let i=0; i<ladderPlayers; i++) {
-                topDiv.innerHTML += `
-                    <div style="width: 100%; text-align: center;">
-                        <input type="text" class="ladder-input top-input" placeholder="이름${i+1}">
-                        <button class="ladder-btn" id="startBtn${i}" onclick="traceLadder(${i})">시작</button>
-                    </div>`;
-                bottomDiv.innerHTML += `
-                    <div style="width: 100%; text-align: center;">
-                        <input type="text" class="ladder-input bot-input" placeholder="결과${i+1}">
-                        <div class="result-box hidden" id="resBox${i}"></div>
-                    </div>`;
+                topDiv.innerHTML += `<div style="width: 100%; text-align: center;"><input type="text" class="ladder-input top-input" placeholder="이름${i+1}"><button class="ladder-btn" id="startBtn${i}" onclick="traceLadder(${i})">시작</button></div>`;
+                bottomDiv.innerHTML += `<div style="width: 100%; text-align: center;"><input type="text" class="ladder-input bot-input" placeholder="결과${i+1}"><div class="result-box hidden" id="resBox${i}"></div></div>`;
             }
-            
             const canvas = document.getElementById('ladderCanvas');
             const ctx = canvas.getContext('2d');
             ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -488,30 +496,22 @@
             });
             document.getElementById('ladderStartBtn').style.display = 'none';
 
-            const w = canvas.width; const h = canvas.height;
-            const step = w / ladderPlayers;
+            const w = canvas.width; const h = canvas.height; const step = w / ladderPlayers;
             ctx.clearRect(0, 0, w, h);
-            
-            ctx.strokeStyle = '#bdc3c7';
-            ctx.lineWidth = 4;
-            ctx.lineCap = "round";
+            ctx.strokeStyle = '#bdc3c7'; ctx.lineWidth = 4; ctx.lineCap = "round";
             
             for(let i=0; i<ladderPlayers; i++) {
                 let x = step * i + step/2;
                 ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, h); ctx.stroke();
             }
 
-            ladderLines = [];
-            const rows = 12;
-            const rowHeight = h / rows;
-            
+            ladderLines = []; const rows = 12; const rowHeight = h / rows;
             for(let r = 1; r < rows; r++) {
                 let y = r * rowHeight;
                 for(let c = 0; c < ladderPlayers - 1; c++) {
                     if(Math.random() < 0.4) {
                         ladderLines.push({ row: r, y: y, col: c });
-                        let startX = step * c + step/2;
-                        let endX = step * (c+1) + step/2;
+                        let startX = step * c + step/2; let endX = step * (c+1) + step/2;
                         ctx.beginPath(); ctx.moveTo(startX, y); ctx.lineTo(endX, y); ctx.stroke();
                         c++; 
                     }
@@ -526,22 +526,18 @@
             const canvas = document.getElementById('ladderCanvas');
             const ctx = canvas.getContext('2d');
             const step = canvas.width / ladderPlayers;
-            
             const colors = ['#e74c3c', '#e67e22', '#f1c40f', '#2ecc71', '#1abc9c', '#3498db', '#9b59b6', '#ff9ff3', '#00d2d3', '#ff6b6b'];
             ctx.strokeStyle = colors[startIndex % colors.length];
             ctx.lineWidth = 6;
 
-            let currentCol = startIndex;
-            let currentY = 0;
+            let currentCol = startIndex; let currentY = 0;
             
             function getNextPoint() {
-                let nextLine = null;
-                let minSubY = 9999;
+                let nextLine = null; let minSubY = 9999;
                 for(let line of ladderLines) {
                     if(line.y > currentY + 1) {
                         if((line.col === currentCol || line.col === currentCol - 1) && line.y < minSubY) {
-                            minSubY = line.y;
-                            nextLine = line;
+                            minSubY = line.y; nextLine = line;
                         }
                     }
                 }
@@ -553,8 +549,7 @@
                 if(!next) {
                     ctx.beginPath(); ctx.moveTo(step * currentCol + step/2, currentY); ctx.lineTo(step * currentCol + step/2, canvas.height); ctx.stroke();
                     let finalResult = document.getElementById(`resBox${currentCol}`);
-                    finalResult.style.backgroundColor = ctx.strokeStyle;
-                    finalResult.style.color = "white";
+                    finalResult.style.backgroundColor = ctx.strokeStyle; finalResult.style.color = "white";
                     isLadderAnimating = false;
                     return;
                 }
@@ -562,12 +557,84 @@
                 ctx.beginPath(); ctx.moveTo(step * currentCol + step/2, currentY); ctx.lineTo(step * currentCol + step/2, next.y); ctx.stroke();
                 let nextCol = (next.col === currentCol) ? currentCol + 1 : currentCol - 1;
                 ctx.beginPath(); ctx.moveTo(step * currentCol + step/2, next.y); ctx.lineTo(step * nextCol + step/2, next.y); ctx.stroke();
-
-                currentCol = nextCol;
-                currentY = next.y;
+                currentCol = nextCol; currentY = next.y;
                 setTimeout(animatePath, 300);
             }
             animatePath();
+        }
+
+        // ==========================================
+        // 🆕 번호뽑기 로직 (중복 제거 & 룰렛 애니메이션)
+        // ==========================================
+        let drawnNumbersHistory = [];
+        let isDrawingNumber = false;
+
+        function resetNumberDraw() {
+            drawnNumbersHistory = [];
+            document.getElementById('drawHistoryList').innerHTML = '';
+            
+            const display = document.getElementById('rollingDisplay');
+            display.innerText = '?';
+            display.style.color = '#e74c3c';
+        }
+
+        function startRollingDraw() {
+            if (isDrawingNumber) return; // 돌아가는 중 클릭 방지
+
+            const maxNum = parseInt(document.getElementById('maxNumberInput').value);
+            if (isNaN(maxNum) || maxNum < 1) {
+                alert("1 이상의 올바른 숫자를 입력해주세요.");
+                return;
+            }
+
+            if (drawnNumbersHistory.length >= maxNum) {
+                alert(`1부터 ${maxNum}까지 모든 번호가 뽑혔습니다!\n초기화 버튼을 눌러 다시 시작해주세요.`);
+                return;
+            }
+
+            isDrawingNumber = true;
+            const display = document.getElementById('rollingDisplay');
+            display.style.color = '#333'; // 룰렛 도는 중 회색계열
+
+            // 당첨될 번호 미리 결정 (중복 피하기)
+            let finalNumber;
+            do {
+                finalNumber = Math.floor(Math.random() * maxNum) + 1;
+            } while (drawnNumbersHistory.includes(finalNumber));
+
+            // 두루루루 애니메이션
+            let ticks = 0;
+            const maxTicks = 25; // 깜빡임 횟수 (시간 조절)
+            
+            const rollInterval = setInterval(() => {
+                // 도는 동안 화면엔 랜덤 숫자 표시
+                display.innerText = Math.floor(Math.random() * maxNum) + 1;
+                ticks++;
+
+                if (ticks >= maxTicks) {
+                    clearInterval(rollInterval);
+                    
+                    // 룰렛 정지 후 짠!
+                    display.innerText = finalNumber;
+                    display.style.color = '#e74c3c';
+                    
+                    // 기록 배열에 추가
+                    drawnNumbersHistory.push(finalNumber);
+                    
+                    // 좌측 목록에 HTML로 추가
+                    const li = document.createElement('li');
+                    li.innerHTML = `<span style="color:#7f8c8d; font-size:14px; margin-right:5px;">${drawnNumbersHistory.length}회차:</span> ${finalNumber}`;
+                    
+                    const historyList = document.getElementById('drawHistoryList');
+                    historyList.appendChild(li);
+                    
+                    // 목록이 길어지면 자동으로 스크롤을 제일 아래로 내려줌
+                    const panel = historyList.parentElement;
+                    panel.scrollTop = panel.scrollHeight;
+
+                    isDrawingNumber = false;
+                }
+            }, 50); // 50ms (0.05초)마다 숫자 변경
         }
     </script>
 
